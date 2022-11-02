@@ -18,7 +18,7 @@
         "metadata": {
             "description": "Enter the storage account sku"
         }
-    }
+    },
     "functions": [],
     "variables": {},
     "resources": [{
@@ -35,5 +35,4 @@
             "tier": "Premium"
         }
     }],
-    "outputs": {}
-}
+ }
