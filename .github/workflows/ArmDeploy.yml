@@ -32,6 +32,6 @@ jobs:
         with:
           scope: subscription
           SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
-          regions: Central US 
+          region: Central US 
           template: ./arm-templates/resourcegroup.json
           deploymentName: Practices-Test2
