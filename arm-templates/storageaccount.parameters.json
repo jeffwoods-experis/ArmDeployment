@@ -10,6 +10,6 @@
         },
         "sku": {
             "value": "Standard_LRS" 
-        },
+        }       
     }
 }
