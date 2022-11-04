@@ -59,7 +59,7 @@ jobs:
           template: ./arm-templates/storageaccount.json
           parameters: 
             sku=Standard_LRS
-            storageAccountName=globoStage003
+            storageAccountName=globostage003
             location="${{ env.location }}"
           deploymentMode: incremental
 
@@ -119,7 +119,7 @@ jobs:
           template: ./arm-templates/storageaccount.json
           parameters: 
             sku=Standard_LRS
-            storageAccountName=globoProd003
+            storageAccountName=globoprod003
             location="${{ env.location }}"
           deploymentMode: incremental
 
