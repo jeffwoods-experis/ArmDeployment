@@ -1,6 +1,7 @@
 # This is a basic workflow to help you get started with Actions
 
 name: armTemplateDeployment
+
 # Controls when the workflow will run
 on:
 
@@ -9,6 +10,12 @@ on:
       - main 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+env:
+  resource_group_name: Practices-Test2
+  location: "Central US"
+  SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
+
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -27,22 +34,26 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Azure Resource Group Practices-Test2
+      - name: Deploy Azure Resource Group ${{ env.resource_group_name }}
         uses: Azure/arm-deploy@v1
         with:
           scope: subscription
-          SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
-          region: Central US 
+          SubscriptionID: ${{ env.SubsciptionID }}
+          region: ${{ env.location }}
           template: ./arm-templates/resourcegroup.json
-          deploymentName: Practices-Test2
+          parameters:
+            location=${{ env.location }}
+            resourceGroupName=${{ env.resource_group_name }}
+            
+          deploymentName: ${{ env.resource_group_name }}
 
       - name: Deploy Storage Account
         uses: Azure/arm-deploy@v1
         id: storageAccountDeploy
         with:
           scope: resourcegroup 
-          resourceGroupName: Practices-Test2
-          SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
+          resourceGroupName: ${{ env.resource_group_name }}
+          SubscriptionID: ${{ env.SubsciptionID }}
           template: ./arm-templates/storageaccount.json
           parameters: ./arm-templates/storageaccount.parameters.json
           deploymentMode: incremental
@@ -51,9 +62,10 @@ jobs:
         uses: Azure/arm-deploy@v1
         with:
           scope: resourcegroup 
-          resourceGroupName: Practices-Test2
-          SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
+          resourceGroupName: ${{ env.resource_group_name }}
+          SubscriptionID: ${{ env.SubsciptionID }}
           template: ./arm-templates/virtualmachine.json
           parameters: 
             adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
+            location=${{ env.location }}
           deploymentMode: incremental    
