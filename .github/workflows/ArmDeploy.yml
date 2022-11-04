@@ -1,32 +1,34 @@
-# This is a basic workflow to help you get started with Actions
+
 
 name: armTemplateDeployment
 
-# Controls when the workflow will run
+
 on:
 
   push: 
     branches:
       - main 
-  # Allows you to run this workflow manually from the Actions tab
+
   workflow_dispatch:
 
 env:
-  resource_group_name: Practices-Test2
-  location: Central US
   SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
 
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  armDeploy:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+jobs:
+
+  armDeployStage: 
+    name: Deploy to Stage 
+    runs-on: ubuntu-latest
+    env:
+      resource_group_name: Practices-Test2-Stage
+      location: Central US
+    environment:
+      name: Stage 
+      
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    
       - uses: actions/checkout@v3
       
       - name: Azure Login
@@ -55,7 +57,70 @@ jobs:
           resourceGroupName: ${{ env.resource_group_name }}
           SubscriptionID: ${{ env.SubsciptionID }}
           template: ./arm-templates/storageaccount.json
-          parameters: ./arm-templates/storageaccount.parameters.json
+          parameters: 
+            sku=Standard_LRS
+            storageAccountName=globoStage003
+            location="${{ env.location }}"
+          deploymentMode: incremental
+
+      - name: Deploy virtual machine
+        uses: Azure/arm-deploy@v1
+        with:
+          scope: resourcegroup 
+          resourceGroupName: ${{ env.resource_group_name }}
+          SubscriptionID: ${{ env.SubsciptionID }}
+          template: ./arm-templates/virtualmachine.json
+          parameters: 
+            adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
+            location="${{ env.location }}"
+          deploymentMode: incremental    
+
+          
+  armDeployProd: 
+    name: Deploy to Prod 
+    runs-on: ubuntu-latest
+    env:
+      resource_group_name: Practices-Test2-Prod
+      location: East US
+    environment:
+      name: Prod 
+  
+    needs: armDeployStage
+
+    steps:
+
+      - uses: actions/checkout@v3
+      
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Azure Resource Group ${{ env.resource_group_name }}
+        uses: Azure/arm-deploy@v1
+        with:
+          scope: subscription
+          SubscriptionID: ${{ env.SubsciptionID }}
+          region: "${{ env.location }}"
+          template: ./arm-templates/resourcegroup.json
+          parameters:
+            location="${{ env.location }}"
+            resourceGroupName=${{ env.resource_group_name }}
+
+          deploymentName: ${{ env.resource_group_name }}
+
+      - name: Deploy Storage Account
+        uses: Azure/arm-deploy@v1
+        id: storageAccountDeploy
+        with:
+          scope: resourcegroup 
+          resourceGroupName: ${{ env.resource_group_name }}
+          SubscriptionID: ${{ env.SubsciptionID }}
+          template: ./arm-templates/storageaccount.json
+          parameters: 
+            sku=Standard_LRS
+            storageAccountName=globoProd003
+            location="${{ env.location }}"
           deploymentMode: incremental
 
       - name: Deploy virtual machine
