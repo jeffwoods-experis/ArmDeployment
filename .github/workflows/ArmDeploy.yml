@@ -13,7 +13,7 @@ on:
 
 env:
   resource_group_name: Practices-Test2
-  location: "Central US"
+  location: Central US
   SubscriptionID: cee41e09-aa75-4bd5-9863-697325f432d7
 
 
@@ -39,12 +39,12 @@ jobs:
         with:
           scope: subscription
           SubscriptionID: ${{ env.SubsciptionID }}
-          region: ${{ env.location }}
+          region: "${{ env.location }}"
           template: ./arm-templates/resourcegroup.json
           parameters:
-            location=${{ env.location }}
+            location="${{ env.location }}"
             resourceGroupName=${{ env.resource_group_name }}
-            
+
           deploymentName: ${{ env.resource_group_name }}
 
       - name: Deploy Storage Account
@@ -67,5 +67,5 @@ jobs:
           template: ./arm-templates/virtualmachine.json
           parameters: 
             adminPassword=${{ secrets.UBUNTU_ADMIN_PASSWORD }}
-            location=${{ env.location }}
+            location="${{ env.location }}"
           deploymentMode: incremental    
