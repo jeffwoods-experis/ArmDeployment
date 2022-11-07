@@ -32,7 +32,7 @@ jobs:
             az deployment sub create \
             --name ${{ env.resource_group_name }} \
             --location "${{ env.location }}" \
-            --template-file ./bicep-templates/resourcegroup.bicep \
+            --template-file ./arm-templates/bicep-templates/resourcegroup.bicep \
             --parameters \
             resourceGroupName=${{ env.resource_group_name }} \
             location="${{ env.location }}"
@@ -43,7 +43,7 @@ jobs:
           inlinescript: |
             az deployment group create \
             --resource-group ${{ env.resource_group_name }} \
-            --template-file ./bicep-templates/virtualnetwork.bicep \
+            --template-file ./arm-templates/bicep-templates/virtualnetwork.bicep \
             --parameters \
             vNetPrefix=bicepazcli \
             location="${{ env.location }}"
@@ -70,7 +70,7 @@ jobs:
           region: ${{ env.location }}
           subscriptionId: ${{ env.subscriptionId }}
           deploymentName: ${{ env.resource_group_name }}
-          template: ./bicep-templates/resourcegroup.bicep
+          template: ./arm-templates/bicep-templates/resourcegroup.bicep
           parameters:
             resourceGroupName=${{ env.resource_group_name }}
             location="${{ env.location }}"
@@ -81,7 +81,7 @@ jobs:
           scope: resourcegroup
           resourceGroupName: ${{ env.resource_group_name }}
           subscriptionId: ${{ env.subscriptionId }}
-          template: ./bicep-templates/virtualnetwork.bicep
+          template: ./arm-templates/bicep-templates/virtualnetwork.bicep
           parameters: 
             vNetPrefix=biceparmdeploy
             location="${{ env.location }}"
